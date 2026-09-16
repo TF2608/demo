@@ -3,55 +3,43 @@
 親ドキュメント: [REQUIREMENTS.md](REQUIREMENTS.md)
 
 ## 前提
-本アプリはサーバー・DBを持たず、ブラウザの `localStorage` にデータを保存する。そのため一般的な「ER図」ではなく、保存されるJSONのデータ構造として定義する。
 
-将来的にサーバー・DBを導入する場合は、下記構造をそのままテーブル定義(List / Card の2テーブル、CardがListに外部キーで紐づく1対多)に変換できる想定。
+本アプリはPostgreSQLにデータを永続化する。リスト・カードはそれぞれテーブルとして保持し、`lists` と `cards` は1対多の関係(1つのリストが複数のカードを持つ)。
 
-## 保存先
-- キー: `trello-lite-board`(localStorageのキー名)
-- 値: `List[]` のJSON文字列
+配列順(JS配列のindex)で表現していた表示順は、各テーブルに明示的な `position`(整数)カラムを持たせて管理する。並び替え・移動時は、対象リスト内のカード(またはボード全体のリスト)の `position` をサーバー側で0始まりの連番に振り直す。
 
-## データ構造
+## テーブル定義
 
-### List(リスト)
-| フィールド | 型 | 説明 |
+### lists(リスト)
+
+| カラム | 型 | 説明 |
 |---|---|---|
-| id | string | 一意なID |
-| title | string | リスト名 |
-| cards | Card[] | このリストに属するカードの配列(表示順=配列順) |
+| id | BIGINT (identity) | 主キー |
+| title | VARCHAR(255) NOT NULL | リスト名 |
+| position | INTEGER NOT NULL | 表示順(0始まり) |
+| created_at | TIMESTAMPTZ NOT NULL | 作成日時 |
+| updated_at | TIMESTAMPTZ NOT NULL | 更新日時 |
 
-### Card(カード)
-| フィールド | 型 | 説明 |
+### cards(カード)
+
+| カラム | 型 | 説明 |
 |---|---|---|
-| id | string | 一意なID |
-| text | string | カードの本文(タイトル) |
-| done | boolean | 完了フラグ |
+| id | BIGINT (identity) | 主キー |
+| list_id | BIGINT NOT NULL, FK → lists.id (ON DELETE CASCADE) | 所属リスト。リスト削除時にカードも削除される |
+| text | TEXT NOT NULL | カードの本文(タイトル) |
+| done | BOOLEAN NOT NULL DEFAULT false | 完了フラグ |
+| priority | VARCHAR(10) NOT NULL DEFAULT 'mid', CHECK (priority IN ('high','mid','low')) | 優先度。未設定の場合は "mid" 扱い |
+| position | INTEGER NOT NULL | リスト内での表示順(0始まり) |
+| created_at | TIMESTAMPTZ NOT NULL | 作成日時 |
+| updated_at | TIMESTAMPTZ NOT NULL | 更新日時 |
 
-## サンプルデータ
-```json
-[
-  {
-    "id": "a1b2c3",
-    "title": "未着手",
-    "cards": [
-      { "id": "x1y2z3", "text": "資料を作成する", "done": false }
-    ]
-  },
-  {
-    "id": "d4e5f6",
-    "title": "進行中",
-    "cards": []
-  },
-  {
-    "id": "g7h8i9",
-    "title": "完了",
-    "cards": [
-      { "id": "p1q2r3", "text": "要件定義をまとめる", "done": true }
-    ]
-  }
-]
-```
+インデックス: `lists(position)`、`cards(list_id, position)`(リスト内のカードを順序付きで取得するため)。
+
+## マイグレーション
+
+スキーマはFlyway(`backend/src/main/resources/db/migration/`)で管理する。`V1__init_schema.sql` がテーブル・制約・インデックスを作成し、`V2__seed_default_board.sql` が初期表示用のサンプルデータ(未着手/進行中/完了の3リストとサンプルカード)を投入する。
 
 ## 補足
-- リスト・カードの表示順は配列の並び順で管理する(順序を表す番号フィールドは持たない)
-- IDは `id: string` としてクライアント側でランダム生成(サーバーの採番なし)
+
+- 並び替え・移動のAPIはクライアントに `position` を直接指定させず、「新しい並び順(IDの配列)」または「移動先リストと挿入位置」を渡し、サーバー側で対象リストの `position` を一括で振り直す(詳細は [FEATURES.md](FEATURES.md) のAPI設計に相当するバックエンド実装を参照)
+- IDはDBの自動採番(identity)を使用し、リストとカードは別テーブル・別シーケンスのため、両者のIDが同じ数値になることがある(それぞれ独立したIDとして扱う)
