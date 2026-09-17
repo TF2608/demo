@@ -9,20 +9,17 @@ Trello風のシンプルなタスク管理アプリ。詳細な要件は [REQUIR
 - Java 21
 - Maven(または `backend/mvnw`)
 - Node.js(LTS)
-- PostgreSQL 16
+- Docker(PostgreSQL 16コンテナを使用)
 
 ## セットアップ
 
 ### 1. PostgreSQLの準備
 
 ```sh
-brew install postgresql@16
-brew services start postgresql@16   # または pg_ctl で直接起動
-
-createdb taskboard
-psql -d postgres -c "CREATE ROLE taskboard LOGIN PASSWORD 'taskboard';"
-psql -d postgres -c "ALTER DATABASE taskboard OWNER TO taskboard;"
+docker compose up -d
 ```
+
+`localhost:5432` にPostgreSQL 16のコンテナが起動する(DB名・ユーザー・パスワードはいずれも `taskboard`)。データは名前付きボリューム(`pgdata`)に永続化される。
 
 ### 2. バックエンドの起動
 
