@@ -78,13 +78,16 @@ export function CardItem({ card, onUpdate }: CardItemProps) {
           <option value="mid">中</option>
           <option value="low">低</option>
         </select>
-        <input
-          type="date"
-          className="card-item-edit-due-date"
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
-          disabled={saving}
-        />
+        <label className="card-item-edit-due-date-label">
+          期限
+          <input
+            type="date"
+            className="card-item-edit-due-date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            disabled={saving}
+          />
+        </label>
         {error && <p className="card-item-error">{error}</p>}
         <div className="card-item-edit-actions">
           <button onClick={handleSave} disabled={saving || text.trim() === ''}>

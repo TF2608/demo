@@ -127,8 +127,105 @@
 
 .card-item-meta {
   display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
   justify-content: space-between;
   font-size: 12px;
   color: var(--text);
   opacity: 0.8;
+}
+
+.card-due-date {
+  color: var(--text);
+}
+
+.card-item-edit-text,
+.card-item-edit-priority,
+.card-item-edit-due-date-label {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text);
+}
+
+.card-item-edit-due-date-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.card-item-edit-due-date {
+  font: inherit;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card-bg);
+  color: var(--text);
+}
+
+.card-item-error,
+.board-column-error {
+  color: #d33;
+  font-size: 12px;
+  margin: 6px 0 0;
+}
+
+.card-item-edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.card-item-edit-actions button {
+  font: inherit;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.card-item-edit-actions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.board-column-title-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.board-column-title-edit input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text);
+}
+
+.board-column-title-edit button {
+  font: inherit;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.board-column-header h2 {
+  cursor: pointer;
 }
