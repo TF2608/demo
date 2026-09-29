@@ -1,6 +1,7 @@
 package com.taskboard.service;
 
 import com.taskboard.dto.ListDto;
+import com.taskboard.dto.ListUpdateRequest;
 import com.taskboard.entity.TaskList;
 import com.taskboard.exception.NotFoundException;
 import com.taskboard.mapper.ListMapper;
@@ -8,6 +9,7 @@ import com.taskboard.repository.TaskListRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
@@ -32,5 +34,20 @@ public class ListService {
         TaskList list = taskListRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("List not found: " + id));
         return listMapper.toDto(list);
+    }
+
+    @Transactional
+    public ListDto updateList(Long id, ListUpdateRequest request) {
+        TaskList list = taskListRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("List not found: " + id));
+
+        if (request.title() != null && request.title().isBlank()) {
+            throw new IllegalArgumentException("title must not be blank");
+        }
+
+        listMapper.applyUpdate(list, request);
+        list.setUpdatedAt(OffsetDateTime.now());
+
+        return listMapper.toDto(taskListRepository.save(list));
     }
 }

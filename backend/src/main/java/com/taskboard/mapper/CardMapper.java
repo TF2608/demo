@@ -19,7 +19,8 @@ public class CardMapper {
                 card.getPriority().getValue(),
                 card.getPosition(),
                 card.getCreatedAt(),
-                card.getUpdatedAt()
+                card.getUpdatedAt(),
+                card.getDueDate()
         );
     }
 
@@ -38,6 +39,9 @@ public class CardMapper {
         }
         if (request.position() != null) {
             card.setPosition(request.position());
+        }
+        if (request.dueDate() != null) {
+            card.setDueDate(request.dueDate());
         }
     }
 }

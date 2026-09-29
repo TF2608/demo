@@ -23,6 +23,7 @@ export interface UpdateCardPayload {
   priority?: Priority
   listId?: number
   position?: number
+  dueDate?: string | null
 }
 
 export function updateCard(id: number, payload: UpdateCardPayload): Promise<CardDto> {

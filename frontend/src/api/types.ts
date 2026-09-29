@@ -9,6 +9,7 @@ export interface CardDto {
   position: number
   createdAt: string
   updatedAt: string
+  dueDate: string | null
 }
 
 export interface ListDto {

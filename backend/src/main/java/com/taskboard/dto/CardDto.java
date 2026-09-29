@@ -1,5 +1,6 @@
 package com.taskboard.dto;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 public record CardDto(
@@ -10,6 +11,7 @@ public record CardDto(
         String priority,
         Integer position,
         OffsetDateTime createdAt,
-        OffsetDateTime updatedAt
+        OffsetDateTime updatedAt,
+        LocalDate dueDate
 ) {
 }
