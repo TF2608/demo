@@ -17,6 +17,7 @@ export function CardItem({ card, onUpdate }: CardItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [text, setText] = useState(card.text)
   const [priority, setPriority] = useState<Priority>(card.priority)
+  const [dueDate, setDueDate] = useState(card.dueDate ?? '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -35,6 +36,7 @@ export function CardItem({ card, onUpdate }: CardItemProps) {
   function startEditing() {
     setText(card.text)
     setPriority(card.priority)
+    setDueDate(card.dueDate ?? '')
     setError(null)
     setIsEditing(true)
   }
@@ -48,7 +50,7 @@ export function CardItem({ card, onUpdate }: CardItemProps) {
     setSaving(true)
     setError(null)
     try {
-      await onUpdate(card.id, { text, priority })
+      await onUpdate(card.id, { text, priority, dueDate: dueDate || null })
       setIsEditing(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : '更新に失敗しました')
@@ -76,6 +78,13 @@ export function CardItem({ card, onUpdate }: CardItemProps) {
           <option value="mid">中</option>
           <option value="low">低</option>
         </select>
+        <input
+          type="date"
+          className="card-item-edit-due-date"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+          disabled={saving}
+        />
         {error && <p className="card-item-error">{error}</p>}
         <div className="card-item-edit-actions">
           <button onClick={handleSave} disabled={saving || text.trim() === ''}>
@@ -100,6 +109,7 @@ export function CardItem({ card, onUpdate }: CardItemProps) {
           <input type="checkbox" checked={card.done} onChange={handleToggleDone} disabled={saving} />
           {card.done ? '完了' : '未完了'}
         </label>
+        {card.dueDate && <span className="card-due-date">期限: {card.dueDate}</span>}
       </div>
       {error && <p className="card-item-error">{error}</p>}
     </div>
