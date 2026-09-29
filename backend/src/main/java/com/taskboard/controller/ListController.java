@@ -1,9 +1,12 @@
 package com.taskboard.controller;
 
 import com.taskboard.dto.ListDto;
+import com.taskboard.dto.ListUpdateRequest;
 import com.taskboard.service.ListService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,5 +30,10 @@ public class ListController {
     @GetMapping("/{id}")
     public ListDto getList(@PathVariable Long id) {
         return listService.getList(id);
+    }
+
+    @PatchMapping("/{id}")
+    public ListDto updateList(@PathVariable Long id, @RequestBody ListUpdateRequest request) {
+        return listService.updateList(id, request);
     }
 }

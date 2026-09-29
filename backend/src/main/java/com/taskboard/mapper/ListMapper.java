@@ -1,6 +1,7 @@
 package com.taskboard.mapper;
 
 import com.taskboard.dto.ListDto;
+import com.taskboard.dto.ListUpdateRequest;
 import com.taskboard.entity.TaskList;
 import org.springframework.stereotype.Component;
 
@@ -15,5 +16,11 @@ public class ListMapper {
                 list.getCreatedAt(),
                 list.getUpdatedAt()
         );
+    }
+
+    public void applyUpdate(TaskList list, ListUpdateRequest request) {
+        if (request.title() != null) {
+            list.setTitle(request.title());
+        }
     }
 }
