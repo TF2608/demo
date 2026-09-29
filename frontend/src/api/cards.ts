@@ -1,4 +1,4 @@
-import { apiGet } from './client'
+import { apiGet, apiPatch } from './client'
 import type { CardDto, Priority } from './types'
 
 export interface SearchCardsParams {
@@ -15,4 +15,16 @@ export function searchCards(params: SearchCardsParams): Promise<CardDto[]> {
     done: params.done,
     text: params.text,
   })
+}
+
+export interface UpdateCardPayload {
+  text?: string
+  done?: boolean
+  priority?: Priority
+  listId?: number
+  position?: number
+}
+
+export function updateCard(id: number, payload: UpdateCardPayload): Promise<CardDto> {
+  return apiPatch<CardDto>(`/api/cards/${id}`, payload)
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { searchCards } from './api/cards'
+import { searchCards, updateCard, type UpdateCardPayload } from './api/cards'
 import { getLists } from './api/lists'
 import type { CardDto, ListDto } from './api/types'
 import { BoardColumn } from './components/BoardColumn'
@@ -43,6 +43,11 @@ function App() {
     return () => clearTimeout(timer)
   }, [filters])
 
+  async function handleCardUpdate(id: number, payload: UpdateCardPayload) {
+    const updated = await updateCard(id, payload)
+    setCards((prev) => prev.map((c) => (c.id === id ? updated : c)))
+  }
+
   const cardsByListId = new Map<number, CardDto[]>()
   for (const card of cards) {
     const existing = cardsByListId.get(card.listId)
@@ -65,7 +70,12 @@ function App() {
 
       <main className="board">
         {lists.map((list) => (
-          <BoardColumn key={list.id} list={list} cards={cardsByListId.get(list.id) ?? []} />
+          <BoardColumn
+            key={list.id}
+            list={list}
+            cards={cardsByListId.get(list.id) ?? []}
+            onCardUpdate={handleCardUpdate}
+          />
         ))}
       </main>
     </div>
