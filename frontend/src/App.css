@@ -229,3 +229,39 @@
 .board-column-header h2 {
   cursor: pointer;
 }
+
+/* カードのドラッグ&ドロップ */
+.card-item {
+  position: relative;
+}
+
+.card-item-drag-handle {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 0 6px;
+  border: none;
+  background: transparent;
+  color: #888;
+  cursor: grab;
+  touch-action: none;
+  line-height: 1.4;
+}
+
+.card-item-drag-handle:active {
+  cursor: grabbing;
+}
+
+.card-item.dragging {
+  opacity: 0.4;
+}
+
+.card-item.drag-overlay {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  cursor: grabbing;
+}
+
+.board-column-cards.drop-target {
+  outline: 2px dashed #6b8cff;
+  outline-offset: -2px;
+}

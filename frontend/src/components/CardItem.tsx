@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import type { UpdateCardPayload } from '../api/cards'
 import type { CardDto, Priority } from '../api/types'
 
@@ -11,15 +13,24 @@ const PRIORITY_LABEL: Record<CardDto['priority'], string> = {
 interface CardItemProps {
   card: CardDto
   onUpdate: (id: number, payload: UpdateCardPayload) => Promise<void>
+  dragDisabled?: boolean
 }
 
-export function CardItem({ card, onUpdate }: CardItemProps) {
+export function CardItem({ card, onUpdate, dragDisabled = false }: CardItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [text, setText] = useState(card.text)
   const [priority, setPriority] = useState<Priority>(card.priority)
   const [dueDate, setDueDate] = useState(card.dueDate ?? '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
+    useSortable({ id: card.id, disabled: dragDisabled || isEditing })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
 
   async function handleToggleDone() {
     setSaving(true)
@@ -61,7 +72,11 @@ export function CardItem({ card, onUpdate }: CardItemProps) {
 
   if (isEditing) {
     return (
-      <div className={`card-item priority-${card.priority}${card.done ? ' done' : ''}`}>
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={`card-item priority-${card.priority}${card.done ? ' done' : ''}`}
+      >
         <input
           className="card-item-edit-text"
           value={text}
@@ -102,7 +117,23 @@ export function CardItem({ card, onUpdate }: CardItemProps) {
   }
 
   return (
-    <div className={`card-item priority-${card.priority}${card.done ? ' done' : ''}`}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`card-item priority-${card.priority}${card.done ? ' done' : ''}${isDragging ? ' dragging' : ''}`}
+    >
+      {!dragDisabled && (
+        <button
+          type="button"
+          className="card-item-drag-handle"
+          ref={setActivatorNodeRef}
+          aria-label="ドラッグして移動"
+          {...attributes}
+          {...listeners}
+        >
+          ⠿
+        </button>
+      )}
       <p className="card-item-text" onClick={startEditing}>
         {card.text}
       </p>

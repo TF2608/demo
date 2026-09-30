@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useDroppable } from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import type { UpdateCardPayload } from '../api/cards'
 import type { UpdateListPayload } from '../api/lists'
 import type { CardDto, ListDto } from '../api/types'
@@ -9,9 +11,14 @@ interface BoardColumnProps {
   cards: CardDto[]
   onCardUpdate: (id: number, payload: UpdateCardPayload) => Promise<void>
   onListUpdate: (id: number, payload: UpdateListPayload) => Promise<void>
+  dragDisabled?: boolean
 }
 
-export function BoardColumn({ list, cards, onCardUpdate, onListUpdate }: BoardColumnProps) {
+// App.tsx の resolveOverListId が 'list-' 接頭辞で判定しているので合わせること
+const listDroppableId = (listId: number) => `list-${listId}`
+
+export function BoardColumn({ list, cards, onCardUpdate, onListUpdate, dragDisabled = false }: BoardColumnProps) {
+  const { setNodeRef, isOver } = useDroppable({ id: listDroppableId(list.id), disabled: dragDisabled })
   const [isEditing, setIsEditing] = useState(false)
   const [title, setTitle] = useState(list.title)
   const [saving, setSaving] = useState(false)
@@ -64,12 +71,16 @@ export function BoardColumn({ list, cards, onCardUpdate, onListUpdate }: BoardCo
         <span className="board-column-count">{cards.length}</span>
       </div>
       {error && <p className="board-column-error">{error}</p>}
-      <div className="board-column-cards">
-        {cards.length === 0 ? (
-          <p className="board-column-empty">該当するカードはありません</p>
-        ) : (
-          cards.map((card) => <CardItem key={card.id} card={card} onUpdate={onCardUpdate} />)
-        )}
+      <div ref={setNodeRef} className={`board-column-cards${isOver ? ' drop-target' : ''}`}>
+        <SortableContext items={cards.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+          {cards.length === 0 ? (
+            <p className="board-column-empty">該当するカードはありません</p>
+          ) : (
+            cards.map((card) => (
+              <CardItem key={card.id} card={card} onUpdate={onCardUpdate} dragDisabled={dragDisabled} />
+            ))
+          )}
+        </SortableContext>
       </div>
     </div>
   )
