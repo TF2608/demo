@@ -1,9 +1,11 @@
 package com.taskboard.controller;
 
 import com.taskboard.dto.CardDto;
+import com.taskboard.dto.CardMoveRequest;
 import com.taskboard.dto.CardUpdateRequest;
 import com.taskboard.entity.Priority;
 import com.taskboard.service.CardService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,5 +45,10 @@ public class CardController {
     @PatchMapping("/{id}")
     public CardDto updateCard(@PathVariable Long id, @RequestBody CardUpdateRequest request) {
         return cardService.updateCard(id, request);
+    }
+
+    @PatchMapping("/{id}/move")
+    public CardDto moveCard(@PathVariable Long id, @Valid @RequestBody CardMoveRequest request) {
+        return cardService.moveCard(id, request);
     }
 }

@@ -26,6 +26,15 @@ export interface UpdateCardPayload {
   dueDate?: string | null
 }
 
+export interface MoveCardPayload {
+  listId: number
+  position: number
+}
+
+export function moveCard(id: number, payload: MoveCardPayload): Promise<CardDto> {
+  return apiPatch<CardDto>(`/api/cards/${id}/move`, payload)
+}
+
 export function updateCard(id: number, payload: UpdateCardPayload): Promise<CardDto> {
   return apiPatch<CardDto>(`/api/cards/${id}`, payload)
 }
